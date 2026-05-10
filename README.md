@@ -52,7 +52,7 @@ silo/
 ## Instalación
 
 ```bash
-git clone https://github.com/osdaeg/silo
+git clone https://codeberg.org/osdaeg/silo
 cd silo
 cp docker-compose.example.yml docker-compose.yml
 ```
@@ -132,8 +132,8 @@ Los enlaces se guardan en una colección llamada **Silo** en Raindrop (se crea a
 
 Silo cuenta con los siguientes clientes adicionales (repositorios separados):
 
-- **silo-cli** — [cliente de línea de comandos (bash)](https://github.com/osdaeg/silo-cli)
-- **silo-tui** — [cliente TUI (Python / Textual)](https://github.com/osdaeg/silo-tui)
-- **silo-firefox** — [extensión para Mozilla Firefox](https://github.com/osdaeg/silo-firefox-extension)
-- **silo-plasmoid** — [widget para KDE Plasma 6](https://github.com/osdaeg/silo-plasmoid)
-- **silo-android** — [app Android (offline-first, integración al menú compartir)](https://github.com/osdaeg/silo-android)
+- **silo-cli** — [cliente de línea de comandos (bash)](https://codeberg.org/osdaeg/silo-cli)
+- **silo-tui** — [cliente TUI (Python / Textual)](https://codeberg.org/osdaeg/silo-tui)
+- **silo-firefox** — [extensión para Mozilla Firefox](https://codeberg.org/osdaeg/silo-firefox-extension)
+- **silo-plasmoid** — [widget para KDE Plasma 6](https://codeberg.org/osdaeg/silo-plasmoid)
+- **silo-android** — [app Android (offline-first, integración al menú compartir)](https://codeberg.org/osdaeg/silo-android)
