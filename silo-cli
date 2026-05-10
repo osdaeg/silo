@@ -1,0 +1,152 @@
+#!/usr/bin/env bash
+# silo-cli — cliente de línea de comandos para Silo
+# Uso: silo [comando] [opciones]
+
+SILO_HOST="${SILO_HOST:-http://192.168.1.10:7123}"
+SILO_TOKEN="${SILO_TOKEN:-changeme}"
+
+AUTH_HEADER="Authorization: Bearer $SILO_TOKEN"
+CT_HEADER="Content-Type: application/json"
+
+_curl() { curl -sf -H "$AUTH_HEADER" "$@"; }
+
+usage() {
+  cat <<EOF
+silo — gestor de enlaces
+
+Uso:
+  silo list [--col ID] [--q BÚSQUEDA]   Lista enlaces
+  silo add <URL> [--title T] [--desc D] [--col ID]   Agrega un enlace
+  silo del <ID>                          Elimina un enlace
+  silo move <ID> <COL_ID>               Mueve enlace a colección
+  silo cols                              Lista colecciones
+  silo col-add <NOMBRE>                  Crea colección
+  silo col-del <ID>                      Elimina colección
+  silo sync                              Fuerza sync con Raindrop
+
+Variables de entorno:
+  SILO_HOST   URL del servidor (default: http://192.168.1.10:7123)
+  SILO_TOKEN  Bearer token de la API
+
+EOF
+}
+
+cmd_list() {
+  local params=""
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --col) params="${params}&collection_id=$2"; shift 2 ;;
+      --q)   params="${params}&q=$(python3 -c "import urllib.parse,sys; print(urllib.parse.quote(sys.argv[1]))" "$2")"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  local result
+  result=$(_curl "${SILO_HOST}/links?${params}") || { echo "Error: no se pudo conectar a Silo" >&2; exit 1; }
+  echo "$result" | python3 -c "
+import json, sys
+links = json.load(sys.stdin)
+if not links:
+    print('  (sin enlaces)')
+    sys.exit(0)
+fmt = '{:<6} {:<40} {:<18} {:<10} {}'
+print(fmt.format('ID', 'URL', 'COLECCIÓN', 'SYNC', 'TÍTULO'))
+print('-' * 90)
+for l in links:
+    url = l['url'][:39]
+    col = (l['collection_name'] or '—')[:17]
+    sync_s = '● sync' if l['synced_to_raindrop'] else '○ pend'
+    title = (l['title'] or '')[:30]
+    print(fmt.format(l['id'], url, col, sync_s, title))
+"
+}
+
+cmd_add() {
+  local url="$1"; shift
+  [[ -z "$url" ]] && { echo "Falta URL" >&2; exit 1; }
+  local title="" desc="" col_id=""
+  while [[ $# -gt 0 ]]; do
+    case $1 in
+      --title) title="$2"; shift 2 ;;
+      --desc)  desc="$2";  shift 2 ;;
+      --col)   col_id="$2"; shift 2 ;;
+      *) shift ;;
+    esac
+  done
+  local body
+  body=$(python3 -c "
+import json, sys
+d = {'url': sys.argv[1]}
+if sys.argv[2]: d['title'] = sys.argv[2]
+if sys.argv[3]: d['description'] = sys.argv[3]
+if sys.argv[4]: d['collection_id'] = int(sys.argv[4])
+print(json.dumps(d))
+" "$url" "$title" "$desc" "${col_id:-}")
+  local result
+  result=$(_curl -X POST -H "$CT_HEADER" -d "$body" "${SILO_HOST}/links") || { echo "Error al agregar" >&2; exit 1; }
+  local id
+  id=$(echo "$result" | python3 -c "import json,sys; print(json.load(sys.stdin)['id'])")
+  echo "✔ Enlace guardado (id=$id)"
+}
+
+cmd_del() {
+  local id="$1"
+  [[ -z "$id" ]] && { echo "Falta ID" >&2; exit 1; }
+  _curl -X DELETE "${SILO_HOST}/links/${id}" > /dev/null || { echo "Error al eliminar" >&2; exit 1; }
+  echo "✔ Enlace $id eliminado"
+}
+
+cmd_move() {
+  local id="$1" col_id="$2"
+  [[ -z "$id" || -z "$col_id" ]] && { echo "Uso: silo move <ID> <COL_ID>" >&2; exit 1; }
+  local body="{\"collection_id\": ${col_id}}"
+  _curl -X PATCH -H "$CT_HEADER" -d "$body" "${SILO_HOST}/links/${id}" > /dev/null || { echo "Error al mover" >&2; exit 1; }
+  echo "✔ Enlace $id movido a colección $col_id"
+}
+
+cmd_cols() {
+  local result
+  result=$(_curl "${SILO_HOST}/collections") || { echo "Error" >&2; exit 1; }
+  echo "$result" | python3 -c "
+import json, sys
+cols = json.load(sys.stdin)
+if not cols: print('  (sin colecciones)'); sys.exit(0)
+for c in cols: print(f\"  {c['id']:<6} {c['name']}\")
+"
+}
+
+cmd_col_add() {
+  local name="$1"
+  [[ -z "$name" ]] && { echo "Falta nombre" >&2; exit 1; }
+  _curl -X POST -H "$CT_HEADER" -d "{\"name\": \"${name}\"}" "${SILO_HOST}/collections" > /dev/null || { echo "Error" >&2; exit 1; }
+  echo "✔ Colección '$name' creada"
+}
+
+cmd_col_del() {
+  local id="$1"
+  [[ -z "$id" ]] && { echo "Falta ID" >&2; exit 1; }
+  _curl -X DELETE "${SILO_HOST}/collections/${id}" > /dev/null || { echo "Error" >&2; exit 1; }
+  echo "✔ Colección $id eliminada"
+}
+
+cmd_sync() {
+  local result
+  result=$(_curl -X POST "${SILO_HOST}/sync") || { echo "Error de sync" >&2; exit 1; }
+  echo "$result" | python3 -c "
+import json, sys
+d = json.load(sys.stdin)
+print(f\"✔ Sync completado: {d['synced']} enlace(s), estado: {d['status']}\")
+"
+}
+
+# ── Dispatch ───────────────────────────────────────────
+case "${1:-}" in
+  list)    shift; cmd_list "$@" ;;
+  add)     shift; cmd_add "$@" ;;
+  del)     shift; cmd_del "$@" ;;
+  move)    shift; cmd_move "$@" ;;
+  cols)    cmd_cols ;;
+  col-add) shift; cmd_col_add "$@" ;;
+  col-del) shift; cmd_col_del "$@" ;;
+  sync)    cmd_sync ;;
+  *)       usage ;;
+esac

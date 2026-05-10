@@ -1,0 +1,5 @@
+docker-compose.yml
+data/*.*
+README.md.github
+
+README.md.codeberg

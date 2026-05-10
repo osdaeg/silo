@@ -1,0 +1,35 @@
+services:
+  silo:
+    build: .
+    container_name: silo
+    restart: unless-stopped
+    ports:
+      - "7123:7123"
+    volumes:
+      - ./data:/data
+    environment:
+      # Auth
+      - SILO_API_TOKEN=TuTokenAPISilo
+
+      # Raindrop OAuth token (personal test token o access token)
+      - RAINDROP_TOKEN=TuTokenDeRaindrop
+
+      # Gotify
+      - GOTIFY_URL=http://192.168.1.10:8088
+      - GOTIFY_TOKEN=TuTokenDeGotify
+
+      # Sync interval en minutos (backup cron)
+      - SYNC_INTERVAL_MINUTES=30
+
+      # Ruta de la DB
+      - DB_PATH=/data/silo.db
+      
+      - PUID=1000
+      - PGID=1000      
+
+    networks:
+      - TuRed
+
+networks:
+  TuRed:
+    external: true
