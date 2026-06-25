@@ -3,3 +3,11 @@ data/*.*
 README.md.github
 
 README.md.codeberg
+
+backup_stack.sh
+
+silo.edit
+
+silo.list
+
+*.bak
