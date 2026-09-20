@@ -12,6 +12,8 @@ Servicio de guardado de enlaces, autoalojado. API REST con dashboard web, sincro
 - Notificaciones via Gotify al sincronizar
 - Base de datos SQLite
 
+
+
 ## Capturas
 
 ![silo](screenshots/main.png)
