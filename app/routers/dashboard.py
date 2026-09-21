@@ -3,6 +3,7 @@ from fastapi import APIRouter, Request, Depends
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from app.database import get_db
+from app.i18n import translations
 
 router = APIRouter(prefix="/dashboard", tags=["dashboard"])
 templates = Jinja2Templates(directory="templates")
@@ -36,4 +37,5 @@ async def dashboard(request: Request, db=Depends(get_db)):
         "pending_sync": pending,
         "last_sync": last_sync,
         "api_token": os.getenv("SILO_API_TOKEN", "changeme"),
+        "t": translations,
     })

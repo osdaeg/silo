@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SILO // Link Storage</title>
+<title>{{ t.title }}</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
 <style>
@@ -502,9 +502,9 @@
 <div class="header">
   <div class="logo">SILO</div>
   <div class="header-sep">//</div>
-  <div style="color: var(--text-dim); font-size: 11px; letter-spacing: 2px;">LINK STORAGE v1.0</div>
+  <div style="color: var(--text-dim); font-size: 11px; letter-spacing: 2px;">{{ t.subtitle }}</div>
   <div class="status-bar">
-    <div class="status-item"><div class="dot"></div> ONLINE</div>
+    <div class="status-item"><div class="dot"></div> {{ t.status_online }}</div>
     <div class="status-item" id="sync-status">
       <div class="dot {% if pending_sync > 0 %}amber{% endif %}"></div>
       RDROP: {% if pending_sync > 0 %}{{ pending_sync }} PENDING{% else %}SYNC{% endif %}
@@ -516,10 +516,10 @@
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-section">
-      <div class="sidebar-label">Colecciones</div>
+      <div class="sidebar-label">{{ t.sidebar_collections }}</div>
       <div id="collections-list">
         <div class="col-item active" data-id="" onclick="filterCollection(this, '')">
-          <span class="col-name">// TODOS</span>
+          <span class="col-name">{{ t.sidebar_all }}</span>
           <span class="col-count" id="count-all">{{ total_links }}</span>
         </div>
         {% for col in collections %}
@@ -531,24 +531,24 @@
         {% endfor %}
       </div>
       <div class="add-col-form">
-        <input type="text" id="new-col-name" placeholder="nueva colección" maxlength="40">
+        <input type="text" id="new-col-name" placeholder="{{ t.sidebar_new_placeholder }}" maxlength="40">
         <button onclick="addCollection()">+</button>
       </div>
     </div>
 
     <div class="sidebar-section stats-block">
-      <div class="sidebar-label">Estado</div>
-      <div class="stat-row"><span>Total</span><span class="stat-val" id="stat-total">{{ total_links }}</span></div>
-      <div class="stat-row"><span>Sin sync</span><span class="stat-val" id="stat-pending">{{ pending_sync }}</span></div>
+      <div class="sidebar-label">{{ t.sidebar_stats }}</div>
+      <div class="stat-row"><span>{{ t.stat_total }}</span><span class="stat-val" id="stat-total">{{ total_links }}</span></div>
+      <div class="stat-row"><span>{{ t.stat_pending }}</span><span class="stat-val" id="stat-pending">{{ pending_sync }}</span></div>
       {% if last_sync %}
       <div class="stat-row" style="margin-top:8px; font-size:10px;">
-        <span>Último sync</span>
+        <span>{{ t.stat_last_sync }}</span>
         <span class="stat-val" style="{% if last_sync.status == 'ok' %}color:var(--green){% else %}color:var(--amber){% endif %}">
           {{ last_sync.status.upper() }}
         </span>
       </div>
       {% endif %}
-      <button class="sync-btn" onclick="triggerSync()">▶ SYNC AHORA</button>
+      <button class="sync-btn" onclick="triggerSync()">{{ t.btn_sync }}</button>
     </div>
   </div>
 
@@ -556,22 +556,22 @@
   <div class="main">
     <div class="toolbar">
       <div class="search-wrap">
-        <input type="text" id="search-input" placeholder="buscar enlaces..." oninput="debounceSearch()">
+        <input type="text" id="search-input" placeholder="{{ t.search_placeholder }}" oninput="debounceSearch()">
       </div>
-      <button class="toolbar-btn primary" onclick="openAddModal()">+ AGREGAR</button>
+      <button class="toolbar-btn primary" onclick="openAddModal()">{{ t.btn_add }}</button>
     </div>
 
     <div class="links-header">
       <div>#</div>
-      <div>ENLACE</div>
-      <div>COLECCIÓN</div>
-      <div>FECHA</div>
-      <div>RAINDROP</div>
+      <div>{{ t.col_link }}</div>
+      <div>{{ t.col_collection }}</div>
+      <div>{{ t.col_date }}</div>
+      <div>{{ t.col_raindrop }}</div>
       <div></div>
     </div>
 
     <div class="links-area" id="links-area">
-      <div class="empty"><div class="empty-icon">▣</div><div class="cursor">CARGANDO</div></div>
+      <div class="empty"><div class="empty-icon">▣</div><div class="cursor">{{ t.loading }}</div></div>
     </div>
   </div>
 </div>
@@ -580,21 +580,21 @@
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <div class="modal-header">
-      <span id="modal-title">NUEVO ENLACE</span>
+      <span id="modal-title">{{ t.modal_new_title }}</span>
       <button class="modal-close" onclick="closeModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="edit-id">
       <div class="field">
-        <label>URL *</label>
-        <input type="text" id="field-url" placeholder="https://..." onblur="autoFetchTitle()">
+        <label>{{ t.label_url }}</label>
+        <input type="text" id="field-url" placeholder="{{ t.placeholder_url }}" onblur="autoFetchTitle()">
       </div>
       <div class="field">
-        <label>Título</label>
-        <input type="text" id="field-title" placeholder="opcional">
+        <label>{{ t.label_title }}</label>
+        <input type="text" id="field-title" placeholder="{{ t.placeholder_title }}">
       </div>
       <div class="field">
-        <label>Descripción</label>
+        <label>{{ t.label_description }}</label>
         <textarea id="field-desc" rows="2" placeholder="opcional"></textarea>
       </div>
       <div class="field">
@@ -605,8 +605,8 @@
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeModal()">CANCELAR</button>
-      <button class="btn primary" onclick="saveLink()">GUARDAR</button>
+      <button class="btn" onclick="closeModal()">{{ t.btn_cancel }}</button>
+      <button class="btn primary" onclick="saveLink()">{{ t.btn_save }}</button>
     </div>
   </div>
 </div>
@@ -615,21 +615,21 @@
 <div class="modal-overlay" id="move-modal">
   <div class="modal">
     <div class="modal-header">
-      <span>MOVER A COLECCIÓN</span>
+      <span>{{ t.modal_move_title }}</span>
       <button class="modal-close" onclick="closeMoveModal()">✕</button>
     </div>
     <div class="modal-body">
       <input type="hidden" id="move-link-id">
       <div class="field">
-        <label>Colección destino</label>
+        <label>{{ t.label_collection_dest }}</label>
         <select id="move-collection">
           <option value="">— sin colección —</option>
         </select>
       </div>
     </div>
     <div class="modal-footer">
-      <button class="btn" onclick="closeMoveModal()">CANCELAR</button>
-      <button class="btn primary" onclick="confirmMove()">MOVER</button>
+      <button class="btn" onclick="closeMoveModal()">{{ t.btn_cancel }}</button>
+      <button class="btn primary" onclick="confirmMove()">{{ t.btn_move_confirm }}</button>
     </div>
   </div>
 </div>
@@ -637,6 +637,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
+  const T = {{ t | tojson }};
   const API = '';
   let currentCollection = '';
   let searchQuery = '';
@@ -656,7 +657,7 @@
   }
 
   function populateCollectionSelects() {
-    const opts = '<option value="">— sin colección —</option>' +
+    const opts = '<option value="">' + T.placeholder_no_collection + '</option>' +
       collections.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
     document.getElementById('field-collection').innerHTML = opts;
     document.getElementById('move-collection').innerHTML = opts;
@@ -678,7 +679,7 @@
   function renderLinks(links) {
     const area = document.getElementById('links-area');
     if (links.length === 0) {
-      area.innerHTML = '<div class="empty"><div class="empty-icon">◻</div><div>SIN RESULTADOS</div></div>';
+      area.innerHTML = `<div class="empty"><div class="empty-icon">◻</div><div>${T.no_results}</div></div>`;
       return;
     }
     area.innerHTML = links.map(l => `
@@ -693,11 +694,11 @@
         <div class="link-collection">${escHtml(l.collection_name || '—')}</div>
         <div class="link-date">${formatDate(l.created_at)}</div>
         <div class="link-sync ${l.synced_to_raindrop ? 'sync-yes' : 'sync-no'}">
-          ${l.synced_to_raindrop ? '● SYNC' : '○ PEND'}
+          ${l.synced_to_raindrop ? T.sync_yes : T.sync_no}
         </div>
         <div class="link-actions">
-          <button class="act-btn" onclick="openEditModal(${l.id})" title="Editar">ED</button>
-          <button class="act-btn" onclick="openMoveModal(${l.id})" title="Mover">MV</button>
+          <button class="act-btn" onclick="openEditModal(${l.id})" title="${T.tooltip_edit}">ED</button>
+          <button class="act-btn" onclick="openMoveModal(${l.id})" title="${T.tooltip_move}">MV</button>
           <button class="act-btn danger" onclick="deleteLink(${l.id})" title="Borrar">✕</button>
         </div>
       </div>
@@ -725,7 +726,7 @@
       document.getElementById('stat-pending').textContent = pending;
       document.getElementById('count-all').textContent = total;
       const syncStatus = document.getElementById('sync-status');
-      syncStatus.innerHTML = `<div class="dot ${pending > 0 ? 'amber' : ''}"></div> RDROP: ${pending > 0 ? pending + ' PENDING' : 'SYNC'}`;
+      syncStatus.innerHTML = `<div class="dot ${pending > 0 ? 'amber' : ''}"></div> ${pending > 0 ? T.status_rdrop_pending.replace("{n}", pending) : T.status_rdrop_sync}`;
     } catch(e) {}
   }
 
@@ -759,7 +760,7 @@
     const titleField = document.getElementById('field-title');
     if (!url || titleField.value.trim()) return; // skip if no URL or title already set
     try {
-      titleField.placeholder = 'obteniendo título...';
+      titleField.placeholder = T.placeholder_fetching_title;
       const res = await fetch(`/links/fetch-title?url=${encodeURIComponent(url)}`, {
         headers: { 'Authorization': `Bearer ${getToken()}` }
       });
@@ -768,12 +769,12 @@
         if (data.title) titleField.value = data.title;
       }
     } catch(e) {}
-    titleField.placeholder = 'opcional';
+    titleField.placeholder = T.placeholder_title;
   }
 
   // ── Add / Edit Modal ───────────────────────────────
   function openAddModal() {
-    document.getElementById('modal-title').textContent = 'NUEVO ENLACE';
+    document.getElementById('modal-title').textContent = T.modal_new_title;
     document.getElementById('edit-id').value = '';
     document.getElementById('field-url').value = '';
     document.getElementById('field-title').value = '';
@@ -789,7 +790,7 @@
     const all = await res.json();
     const link = all.find(l => l.id === id);
     if (!link) return;
-    document.getElementById('modal-title').textContent = 'EDITAR ENLACE';
+    document.getElementById('modal-title').textContent = T.modal_edit_title;
     document.getElementById('edit-id').value = id;
     document.getElementById('field-url').value = link.url;
     document.getElementById('field-title').value = link.title || '';
@@ -808,7 +809,7 @@
     const title = document.getElementById('field-title').value.trim();
     const desc = document.getElementById('field-desc').value.trim();
     const colId = document.getElementById('field-collection').value;
-    if (!url) { toast('La URL es obligatoria', true); return; }
+    if (!url) { toast(T.url_required, true); return; }
 
     const body = {
       url, title: title || null, description: desc || null,
@@ -823,23 +824,23 @@
       body: JSON.stringify(body)
     });
     if (res.ok) {
-      toast(id ? 'Enlace actualizado' : 'Enlace guardado');
+      toast(id ? T.toast_updated : T.toast_saved);
       closeModal();
       loadLinks();
     } else {
-      toast('Error al guardar', true);
+      toast(T.toast_save_error, true);
     }
   }
 
   // ── Delete ─────────────────────────────────────────
   async function deleteLink(id) {
-    if (!confirm('¿Eliminar este enlace?')) return;
+    if (!confirm(T.confirm_delete_link)) return;
     const res = await fetch(`/links/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${getToken()}` }
     });
-    if (res.ok) { toast('Enlace eliminado'); loadLinks(); }
-    else toast('Error al eliminar', true);
+    if (res.ok) { toast(T.toast_deleted); loadLinks(); }
+    else toast(T.toast_delete_error, true);
   }
 
   // ── Move ───────────────────────────────────────────
@@ -859,8 +860,8 @@
       headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${getToken()}` },
       body: JSON.stringify({ collection_id: colId ? parseInt(colId) : null })
     });
-    if (res.ok) { toast('Enlace movido'); closeMoveModal(); loadLinks(); }
-    else toast('Error al mover', true);
+    if (res.ok) { toast(T.toast_moved); closeMoveModal(); loadLinks(); }
+    else toast(T.toast_move_error, true);
   }
 
   // ── Collections ────────────────────────────────────
@@ -887,13 +888,13 @@
       list.appendChild(div);
       populateCollectionSelects();
       document.getElementById('new-col-name').value = '';
-      toast('Colección creada');
-    } else toast('Error al crear colección', true);
+      toast(T.toast_col_created);
+    } else toast(T.toast_col_error, true);
   }
 
   async function deleteCollection(evt, id) {
     evt.stopPropagation();
-    if (!confirm('¿Eliminar colección? Los enlaces quedarán sin colección.')) return;
+    if (!confirm(T.confirm_delete_col)) return;
     const res = await fetch(`/collections/${id}`, {
       method: 'DELETE',
       headers: { 'Authorization': `Bearer ${getToken()}` }
@@ -904,13 +905,13 @@
       if (el) el.remove();
       populateCollectionSelects();
       if (currentCollection === String(id)) filterCollection(document.querySelector('.col-item'), '');
-      toast('Colección eliminada');
-    } else toast('Error al eliminar colección', true);
+      toast(T.toast_col_deleted);
+    } else toast(T.toast_col_del_error, true);
   }
 
   // ── Sync ───────────────────────────────────────────
   async function triggerSync() {
-    toast('Iniciando sync con Raindrop...');
+    toast(T.toast_sync_start);
     // Hit a dedicated sync endpoint
     const res = await fetch('/sync', {
       method: 'POST',
@@ -918,9 +919,9 @@
     });
     if (res.ok) {
       const data = await res.json();
-      toast(`Sync: ${data.synced} enlace(s), estado: ${data.status}`);
+      toast(T.toast_sync_result.replace("{n}", data.synced).replace("{status}", data.status));
       loadLinks();
-    } else toast('Error en sync', true);
+    } else toast(T.toast_sync_error, true);
   }
 
   // ── Init ───────────────────────────────────────────
